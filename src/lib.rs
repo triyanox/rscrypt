@@ -87,7 +87,6 @@ pub fn encode(src: &[u8]) -> String {
 pub fn gen_salt(len: usize) -> String {
     let mut rng = rand::thread_rng();
     let mut salt = String::new();
-    // the salt should start with $len$
     salt.push_str("$");
     salt.push_str(&len.to_string());
     salt.push_str("$");
