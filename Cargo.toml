@@ -1,5 +1,6 @@
 [package]
 name = "rscrypt"
+description = "rscrypt is a simple, fast, and secure encryption tool written in Rust."
 version = "0.1.0"
 edition = "2021"
 authors = ["Achaq <contact@achaq.codes>"]
