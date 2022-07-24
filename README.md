@@ -34,7 +34,7 @@ cargo add rscrypt
 use rscrypt::{gen_salt, hash, compare};
 
 fn main() {
-    let salt = gen_salt();
+    let salt = gen_salt(10);
     let hash = hash(&salt, "password");
     let is_correct = compare("password", &hash);
     println!("{}", is_correct);
