@@ -8,7 +8,7 @@ Add rscrypt to your Cargo.toml:
 
 ```toml
 [dependencies]
-rscrypt = "0.1.0"
+rscrypt = "*"
 ```
 
 or install via cargo
