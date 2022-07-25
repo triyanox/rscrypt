@@ -14,6 +14,20 @@ static INDEX_TABLE: [u8; 128] = [
     37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 255, 255, 255, 255, 255,
 ];
 
+/**
+[decode]
+ */
+/**
+Decode a base64 string into a byte vector.
+*/
+///
+/// # Examples
+///
+/// ```
+/// use rscrypt::decode;
+///
+/// decode(base64_string);
+/// ```
 pub fn decode(src: &[u8]) -> Vec<u8> {
     let mut dst = Vec::with_capacity(src.len() * 3 / 4);
     let mut i = 0;
@@ -51,6 +65,20 @@ pub fn decode(src: &[u8]) -> Vec<u8> {
     dst
 }
 
+/**
+[encode]
+ */
+/**
+Encode a byte vector into a base64 string.
+*/
+///
+/// # Examples
+///
+/// ```
+/// use rscrypt::encode;
+///
+/// encode(byte_vec);
+/// ```
 pub fn encode(src: &[u8]) -> String {
     let mut dst = String::with_capacity(src.len() * 4 / 3);
     let mut i = 0;
@@ -84,6 +112,20 @@ pub fn encode(src: &[u8]) -> String {
     dst
 }
 
+/**
+[gen_salt]
+ */
+/**
+Generates a salt of the given length.
+*/
+///
+/// # Examples
+///
+/// ```
+/// use rscrypt::gen_salt;
+///
+/// gen_salt(length);
+/// ```
 pub fn gen_salt(len: usize) -> String {
     let mut rng = rand::thread_rng();
     let mut salt = String::new();
@@ -96,7 +138,20 @@ pub fn gen_salt(len: usize) -> String {
     }
     salt
 }
-
+/**
+[get_salt]
+ */
+/**
+Extracts the salt from a hashed string
+*/
+///
+/// # Examples
+///
+/// ```
+/// use rscrypt::get_salt;
+///
+/// get_salt(hashed);
+/// ```
 pub fn get_salt(hash: &str) -> String {
     let re = Regex::new(r"\$(\d+)\$(.+)").unwrap();
     let caps = re.captures(hash).unwrap();
@@ -104,18 +159,47 @@ pub fn get_salt(hash: &str) -> String {
     salt.to_string()
 }
 
-pub fn hash(salt: &str, password: &str) -> String {
+/**
+[hash]
+ */
+/**
+Hashes the salt with the given string and return a hashed string
+*/
+///
+/// # Examples
+///
+/// ```
+/// use rscrypt::{hash, gen_salt};
+///
+/// let salt = gen_salt(10);
+/// hash(salt, unhashed_str);
+/// ```
+pub fn hash(salt: &str, unhashed_str: &str) -> String {
     let mut hasher = Sha256::new();
     let mut hashed = String::new();
     let mut unhashed = String::new();
     unhashed.push_str(salt);
-    unhashed.push_str(password);
+    unhashed.push_str(unhashed_str);
     hasher.update(unhashed.as_bytes());
     hashed.push_str(&encode(&hasher.finalize()));
     hashed.push_str(&salt);
     hashed
 }
 
+/**
+[compare]
+ */
+/**
+Compares an unhashed string with a hashed string and return a boolean
+*/
+///
+/// # Examples
+///
+/// ```
+/// use rscrypt::compare;
+///
+/// let result = compare(unhashed, hashed);
+/// ```
 pub fn compare(src: &str, dst: &str) -> bool {
     let salt = get_salt(dst);
     let hashed = hash(&salt, src);
