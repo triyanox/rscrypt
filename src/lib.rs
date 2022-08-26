@@ -135,7 +135,7 @@ pub fn gen_salt(len: usize) -> String {
 
     for n in 0..len {
         if n % 3 == 0 {
-            salt.push(rng.gen_range(0..9) as u8 as char);
+            salt.push(rng.gen_range(b'0'..b'9') as char);
         } else {
             salt.push(rng.gen_range(b'a'..b'z') as char);
         }
