@@ -133,8 +133,12 @@ pub fn gen_salt(len: usize) -> String {
     salt.push_str(&len.to_string());
     salt.push_str("$");
 
-    for _ in 0..len {
-        salt.push(rng.gen_range(b'a'..b'z') as char);
+    for n in 0..len {
+        if n % 3 == 0 {
+            salt.push(rng.gen_range(0..9) as u8 as char);
+        } else {
+            salt.push(rng.gen_range(b'a'..b'z') as char);
+        }
     }
     salt
 }
