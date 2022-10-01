@@ -181,6 +181,7 @@ pub fn hash(salt: &str, unhashed_str: &str) -> String {
     let cost = get_cost(&salt);
     let rounds = 2u32.pow(cost as u32);
     let mut hashed = String::from(unhashed_str);
+    hashed.push_str(&salt);
     for _ in 0..rounds {
         let mut hash = Sha256::new();
         hash.update(hashed.as_bytes());
