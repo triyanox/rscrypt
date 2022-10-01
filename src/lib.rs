@@ -16,16 +16,11 @@ static INDEX_TABLE: [u8; 128] = [
 
 /**
 [decode]
- */
-/**
-Decode a base64 string into a byte vector.
+Decode a base64 string into a byte array.
 */
-///
-/// # Examples
-///
+/// # Example
 /// ```
 /// use rscrypt::decode;
-///
 /// decode(base64_string);
 /// ```
 pub fn decode(src: &[u8]) -> Vec<u8> {
@@ -67,16 +62,11 @@ pub fn decode(src: &[u8]) -> Vec<u8> {
 
 /**
 [encode]
- */
-/**
-Encode a byte vector into a base64 string.
+Encode a byte array into a base64 string.
 */
-///
-/// # Examples
-///
+/// # Example
 /// ```
 /// use rscrypt::encode;
-///
 /// encode(byte_vec);
 /// ```
 pub fn encode(src: &[u8]) -> String {
@@ -114,46 +104,44 @@ pub fn encode(src: &[u8]) -> String {
 
 /**
 [gen_salt]
- */
-/**
-Generates a salt of the given length.
+Generates a salt of the given cost.
 */
-///
-/// # Examples
-///
+/// # Example
 /// ```
 /// use rscrypt::gen_salt;
-///
-/// gen_salt(length);
+/// gen_salt(cost);
 /// ```
-pub fn gen_salt(len: usize) -> String {
+pub fn gen_salt(cost: usize) -> String {
     let mut rng = rand::thread_rng();
     let mut salt = String::new();
     salt.push_str("$");
-    salt.push_str(&len.to_string());
+    salt.push_str(&cost.to_string());
     salt.push_str("$");
-
-    for n in 0..len {
+    let mut phrase = String::new();
+    for n in 0..cost {
         if n % 3 == 0 {
-            salt.push(rng.gen_range(b'0'..b'9') as char);
+            phrase.push(rng.gen_range(b'0'..b'9') as char);
         } else {
-            salt.push(rng.gen_range(b'a'..b'z') as char);
+            phrase.push(rng.gen_range(b'a'..b'z') as char);
         }
     }
+    let rounds = 2u32.pow(cost as u32);
+    for _ in 0..rounds {
+        let mut hash = Sha256::new();
+        hash.update(phrase.as_bytes());
+        phrase = encode(&hash.finalize());
+    }
+    salt.push_str(&phrase);
     salt
 }
+
 /**
 [get_salt]
- */
-/**
 Extracts the salt from a hashed string
 */
-///
-/// # Examples
-///
+/// # Example
 /// ```
 /// use rscrypt::get_salt;
-///
 /// get_salt(hashed);
 /// ```
 pub fn get_salt(hash: &str) -> String {
@@ -164,44 +152,51 @@ pub fn get_salt(hash: &str) -> String {
 }
 
 /**
-[hash]
- */
+[get_cost]
+Extracts the cost from a salt
+*/
+/// # Example
+/// ```
+/// use rscrypt::get_cost;
+/// get_cost(salt);
+/// ```
+fn get_cost(salt: &str) -> usize {
+    let re = Regex::new(r"\$(\d+)\$").unwrap();
+    let caps = re.captures(salt).unwrap();
+    let cost = caps[1].parse::<usize>().unwrap();
+    cost
+}
+
 /**
+[hash]
 Hashes the salt with the given string and return a hashed string
 */
-///
-/// # Examples
-///
+/// # Example
 /// ```
 /// use rscrypt::{hash, gen_salt};
-///
 /// let salt = gen_salt(10);
 /// hash(salt, unhashed_str);
 /// ```
 pub fn hash(salt: &str, unhashed_str: &str) -> String {
-    let mut hasher = Sha256::new();
-    let mut hashed = String::new();
-    let mut unhashed = String::new();
-    unhashed.push_str(salt);
-    unhashed.push_str(unhashed_str);
-    hasher.update(unhashed.as_bytes());
-    hashed.push_str(&encode(&hasher.finalize()));
+    let cost = get_cost(&salt);
+    let rounds = 2u32.pow(cost as u32);
+    let mut hashed = String::from(unhashed_str);
+    for _ in 0..rounds {
+        let mut hash = Sha256::new();
+        hash.update(hashed.as_bytes());
+        hashed = encode(&hash.finalize());
+    }
     hashed.push_str(&salt);
     hashed
 }
 
 /**
 [compare]
- */
-/**
 Compares an unhashed string with a hashed string and return a boolean
 */
-///
-/// # Examples
-///
+/// # Example
 /// ```
 /// use rscrypt::compare;
-///
 /// let result = compare(unhashed, hashed);
 /// ```
 pub fn compare(src: &str, dst: &str) -> bool {
@@ -217,30 +212,18 @@ mod tests {
     fn test_encode() {
         let src = b"Hello World";
         let dst = encode(src);
-        assert_eq!(dst, "SGVsbG8gV29ybGQ=");
+        assert_eq!(dst, "bGVIIG9scm9XGRs=");
     }
     #[test]
     fn test_decode() {
-        let src = "SGVsbG8gV29ybGQ=";
+        let src = "bGVIIG9scm9XGRs=";
         let dst = decode(src.as_bytes());
-        assert_eq!(dst, b"Hello World");
-    }
-    #[test]
-    fn test_gen_salt() {
-        let salt = gen_salt(16);
-        assert_eq!(salt.len(), 20);
-    }
-    #[test]
-    fn test_hash() {
-        let salt = gen_salt(16);
-        let password = "password";
-        let hashed = hash(&salt, password);
-        assert_eq!(hashed.len(), 64);
+        assert_eq!(dst, decode(encode(b"Hello World").as_bytes()));
     }
     #[test]
     fn test_compare() {
         let salt = gen_salt(16);
-        let password = "password";
+        let password = "password@8881((!jjda___$";
         let hashed = hash(&salt, password);
         assert!(compare(password, &hashed));
     }

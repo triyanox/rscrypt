@@ -23,6 +23,7 @@ cargo add rscrypt
 
 - `gen_salt`: Generates a random salt.
 - `get_salt`: Extracts the salt from the hashed string.
+- `get_cost`: Extracts the cost from the salt.
 - `hash`: Hashes a string with a salt.
 - `encode`: Encodes a string to base64.
 - `decode`: Decodes a base64 string.
