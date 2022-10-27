@@ -1,5 +1,7 @@
 # 🔑 rscrypt
 
+[![Rate this package](https://badges.openbase.com/rust/rating/rscrypt.svg?token=DXzSYfymfIyxGQ7pnKTwNfu6L/6K/eL/yFVW09TDw8o=)](https://openbase.com/rust/rscrypt?utm_source=embedded&utm_medium=badge&utm_campaign=rate-badge)
+
 rscrypt is a simple, fast, and secure encryption tool written in Rust.
 
 # Usage
