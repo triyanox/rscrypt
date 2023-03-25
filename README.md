@@ -2,7 +2,7 @@
 
 [![Rate this package](https://badges.openbase.com/rust/rating/rscrypt.svg?style=openbase&token=jegmjYAyM4kvHND4ASaphN2tpYqF1XfW7e+HedvxkVA=)](https://openbase.com/rust/rscrypt?utm_source=embedded&amp;utm_medium=badge&amp;utm_campaign=rate-badge)
 
-The `Rscrypt` library provides functionality for creating and verifying password hashes using the rscrypt algorithm.
+The `Rscrypt` library provides functionality for creating and verifying password hashes.
 
 ## 🚀 Installation
 
