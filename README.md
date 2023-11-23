@@ -55,7 +55,7 @@ let hashed = Rscrypt::hash(&salt, "password");
 assert!(Rscrypt::compare("password", &hashed));
 ```
 
-### 🔍 Function `get_salt(hash: &str) -> Option<String>`
+### Function `get_salt(hash: &str) -> Option<String>`
 
 This function extracts the salt value used for hashing from the given `hash` string.
 
@@ -92,6 +92,6 @@ let hash = "iIBDWiEk0118e29VbozxVmoCscUzu6k05cKGFbtgogI=$rscrypt$0.2.0$10$rLBARH
 assert!(Rscrypt::is_valid_hash(&hash));
 ```
 
-## 📝 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
